@@ -118,7 +118,7 @@ def login():
 
     return user
 
-@app.route('/notify', methods['GET'])
+@app.route('/notify', methods=['GET'])
 def notify():
     for key in r.scan_iter():
         user_data = loads(r.get(key))
