@@ -1,4 +1,5 @@
 from flask import Flask, request, abort
+from flask_mail import Mail, Message
 from json import loads, dumps
 from flask_cors import CORS
 import requests
@@ -6,12 +7,24 @@ import redis
 import os
 from pytz import timezone
 from datetime import datetime
-from constants import BASE_URL, API_KEY
+from constants import BASE_URL, API_KEY, ADDRESS, PASSWORD
+from notify import get_data, get_valid_hours 
 
 r = redis.from_url(os.environ.get('REDIS_URL'))
 
 app = Flask(__name__)
 cors = CORS(app)
+mail_settings = {
+    "MAIL_SERVER": 'smtp.gmail.com',
+    "MAIL_PORT": 465,
+    "MAIL_USE_TLS": False,
+    "MAIL_USE_SSL": True,
+    "MAIL_USERNAME": ADDRESS,
+    "MAIL_PASSWORD": PASSWORD 
+}
+
+app.config.update(mail_settings)
+mail = Mail(app)
 
 def get_valid_hours(data):
     valid_hours = []
@@ -104,6 +117,25 @@ def login():
         r.set(email, dumps(user))
 
     return user
+
+@app.route('/notify', methods['GET'])
+def notify():
+    for key in r.scan_iter():
+        user_data = loads(r.get(key))
+        for data in user_data['locations']:
+            weather_data = get_data(data)
+            if weather_data:
+                valid_hours = get_valid_hours(data, weather_data)
+                location_string = write_location_string(valid_hours)
+                message= f"Location: {data['name']}\n\n"
+                message+=location_string
+                with app.app_context():
+                    msg = Message(subject="Conditions Application notification for the week",
+                            sender=app.config.get("MAIL_USERNAME"),
+                            recipients=[user_data['email']], # replace with your email for testing
+                                body="This is a test email I sent with Gmail and Python!")
+                    mail.send(msg)
+
 
 if __name__ == '__main__':
     app.run()

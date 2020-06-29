@@ -66,31 +66,3 @@ def get_data(data):
         weather_data = r.json()
     return weather_data
 
-def send_email(text, to, s):
-    subject = 'Conditions Application notification for the week' 
-    msg = MIMEMultipart()
-    return 0
-
-r = redis.StrictRedis(host='localhost', port=6379, db=0)
-s = smtplib.SMTP('smtp.gmail.com', 587)
-s.ehlo()
-s.starttls()
-s.login(ADDRESS, PASSWORD)
-
-for key in r.scan_iter():
-    user_data = loads(r.get(key))
-    for data in user_data['locations']:
-        weather_data = get_data(data)
-        if weather_data:
-            valid_hours = get_valid_hours(data, weather_data)
-            location_string = write_location_string(valid_hours)
-            message= f"Location: {data['name']}\n\n"
-            message+=location_string
-            msg = MIMEMultipart()
-            msg['From']=ADDRESS
-            msg['To']=user_data['email']
-            msg['Subject']='Conditions App notification for the week'
-            msg.attach(MIMEText(message, 'plain'))
-            s.send_message(msg)
-            del msg
-s.quit()
