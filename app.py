@@ -7,7 +7,7 @@ import redis
 import os
 from pytz import timezone
 from datetime import datetime
-from constants import BASE_URL, API_KEY, ADDRESS, PASSWORD
+from constants import ADDRESS, PASSWORD
 from notify import get_data, get_valid_hours 
 
 r = redis.from_url(os.environ.get('REDIS_URL'))
@@ -25,40 +25,6 @@ mail_settings = {
 
 app.config.update(mail_settings)
 mail = Mail(app)
-
-def get_valid_hours(data):
-    valid_hours = []
-
-    for hour in data['hourly']:
-        valid = True
-        for param, val in params.items():
-            if param in hour:
-                if val['minimum']<=hour[param] and val['maximum']>=hour[param]:
-                    continue
-                else:
-                    valid = False
-        if valid:
-            timestamp = hour['dt']
-            dt_object = datetime.fromtimestamp(timestamp).astimezone(timezone(time_range['time_zone']))
-            h_ = int(dt_object.strftime('%H'))
-            valid_hour = False
-            for h in time_range['ranges']:
-                if h_>=h[0] and h_<=h[1]:
-                    valid_hour = {'hour': h_,
-                                  'temp': hour['temp'],
-                                  'humidity': hour['humidity'],
-                                  'wind_speed': hour['wind_speed'],
-                                  'dew_point': hour['dew_point'],
-                                  'description': hour['weather'][0]['description']}
-                    valid_hours.append(valid_hour)
-
-def get_data():
-    url = BASE_URL.format(location[0], location[1], APP_ID)
-    r = requests.get(url)
-    data = None
-    if r.status_code==200:
-        data = r.json()
-    return data
 
 @app.route('/', methods=['GET'])
 def index():

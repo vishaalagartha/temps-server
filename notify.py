@@ -1,13 +1,9 @@
-import redis
 import requests
 from json import loads
 from pytz import timezone
 from datetime import datetime
-from constants import BASE_URL, API_KEY, ADDRESS, PASSWORD
+from constants import BASE_URL, API_KEY
 from helpers import write_location_string
-import smtplib
-from email.mime.multipart import MIMEMultipart
-from email.mime.text import MIMEText
 
 def get_valid_hours(data, weather_data):
     params = {'temp': {'minimum': int(data['temp']['minimum'])+273,
@@ -65,4 +61,3 @@ def get_data(data):
     if r.status_code==200:
         weather_data = r.json()
     return weather_data
-
