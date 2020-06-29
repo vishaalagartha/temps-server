@@ -3,11 +3,12 @@ from json import loads, dumps
 from flask_cors import CORS
 import requests
 import redis
+import os
 from pytz import timezone
 from datetime import datetime
 from constants import BASE_URL, API_KEY
 
-r = redis.StrictRedis(host='localhost', port=6379, db=0)
+r = redis.from_url(os.environ.get('REDIS_URL'))
 
 app = Flask(__name__)
 cors = CORS(app)
