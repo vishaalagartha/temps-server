@@ -100,8 +100,9 @@ def notify():
                     msg = Message(subject="Conditions Application notification for the week",
                             sender=app.config.get("MAIL_USERNAME"),
                             recipients=[user_data['email']], # replace with your email for testing
-                                body="This is a test email I sent with Gmail and Python!")
+                                body=message)
                     mail.send(msg)
+    return 'Success'
 
 
 if __name__ == '__main__':
