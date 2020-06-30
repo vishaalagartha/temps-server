@@ -3,7 +3,6 @@ from json import loads
 from pytz import timezone
 from datetime import datetime
 from constants import BASE_URL, API_KEY
-from helpers import write_location_string
 
 def get_valid_hours(data, weather_data):
     params = {'temp': {'minimum': int(data['temp']['minimum'])+273,

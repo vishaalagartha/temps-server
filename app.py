@@ -9,6 +9,7 @@ from pytz import timezone
 from datetime import datetime
 from constants import ADDRESS, PASSWORD
 from notify import get_data, get_valid_hours 
+from helpers import write_location_string
 
 r = redis.from_url(os.environ.get('REDIS_URL'))
 
